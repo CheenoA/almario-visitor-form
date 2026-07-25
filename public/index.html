@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Almario Residence Visitor Form</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{
+    --paper:#faf7f2; --card:#ffffff; --ink:#211d18; --ink-soft:#5c554b;
+    --line:#e4ddd2; --accent:#8a6d3b; --accent-dark:#6f5527; --error:#a03e2d; --ok:#3d6b4f;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html{font-size:17px;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    line-height:1.55; min-height:100vh;
+  }
+  .serif{font-family:Georgia,"Times New Roman",serif;}
+  .wrap{max-width:780px; margin:0 auto; padding:28px 20px 80px;}
+  header.masthead{text-align:center; padding:26px 0 22px; border-bottom:1px solid var(--line); margin-bottom:30px;}
+  .crest{width:44px; height:44px; margin:0 auto 12px; border:1.5px solid var(--accent); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-family:Georgia,serif; font-size:20px; color:var(--accent);}
+  header.masthead h1{font-family:Georgia,"Times New Roman",serif; font-weight:normal; font-size:1.85rem; letter-spacing:.04em;}
+  header.masthead .tag{margin-top:6px; font-size:.8rem; letter-spacing:.28em; text-transform:uppercase; color:var(--ink-soft);}
+  .intro{font-size:.95rem; color:var(--ink-soft); text-align:center; max-width:560px; margin:0 auto 34px;}
+  .step{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:26px 24px; margin-bottom:26px;
+    box-shadow:0 1px 3px rgba(60,50,30,.05);}
+  .step-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px;}
+  .step-num{font-family:Georgia,serif; font-size:.85rem; color:var(--accent); letter-spacing:.12em; white-space:nowrap;}
+  .step h2{font-family:Georgia,"Times New Roman",serif; font-weight:normal; font-size:1.3rem;}
+  .step .hint{font-size:.88rem; color:var(--ink-soft); margin-bottom:18px;}
+  label.f{display:block; font-size:.82rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin:16px 0 6px;}
+  input[type=text],input[type=tel],input[type=email],select,textarea{
+    width:100%; font-size:1.05rem; padding:14px 14px; border:1px solid var(--line); border-radius:10px;
+    background:#fffdf9; color:var(--ink); font-family:inherit; appearance:none; -webkit-appearance:none; min-height:52px;
+  }
+  select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9'><path d='M1 1l6 6 6-6' stroke='%235c554b' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat; background-position:right 16px center; padding-right:44px;}
+  textarea{min-height:84px; resize:vertical;}
+  input:focus,select:focus,textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(138,109,59,.14);}
+  .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
+  .chip{border:1px solid var(--line); background:#fbf8f2; border-radius:999px; padding:10px 18px; font-size:.92rem;
+    color:var(--ink-soft); cursor:pointer; min-height:44px;}
+  .chip.on{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .photo-zone{border:1.5px dashed var(--line); border-radius:12px; padding:22px; text-align:center; background:#fbf8f2;}
+  .photo-zone img{max-width:100%; max-height:290px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); display:block; margin:0 auto 14px;}
+  .btn{display:inline-block; border:none; border-radius:10px; padding:15px 26px; font-size:1.02rem; font-family:inherit;
+    cursor:pointer; min-height:52px; letter-spacing:.02em;}
+  .btn-primary{background:var(--accent); color:#fff;}
+  .btn-primary:active{background:var(--accent-dark);}
+  .btn-ghost{background:transparent; color:var(--accent); border:1px solid var(--accent);}
+  .btn:disabled{opacity:.4; cursor:default;}
+  .nda-panel{border:1px solid var(--line); border-radius:10px; background:#fffdf9; height:380px; overflow-y:auto;
+    -webkit-overflow-scrolling:touch; padding:26px 26px 32px; font-family:Georgia,"Times New Roman",serif; font-size:.95rem; line-height:1.7;}
+  .nda-panel h3{text-align:center; font-size:1.02rem; letter-spacing:.03em; margin-bottom:18px; font-weight:bold;}
+  .nda-panel p{margin-bottom:13px; text-align:justify;}
+  .nda-panel p.c{text-align:center; font-weight:bold;}
+  .nda-panel h4{font-size:.97rem; margin:18px 0 8px;}
+  .nda-panel ul{margin:0 0 13px 22px;}
+  .nda-panel li{margin-bottom:9px; text-align:justify;}
+  .nda-panel .m{background:rgba(138,109,59,.13); border-radius:3px; padding:0 3px; font-style:italic;}
+  .nda-panel .m.filled{font-style:normal; font-weight:bold; background:rgba(138,109,59,.10);}
+  .sigblock{display:flex; gap:24px; margin:26px 0 10px; flex-wrap:wrap;}
+  .sigcol{flex:1; min-width:200px; text-align:center; padding-top:44px;}
+  .sigcol .nm{border-top:1px solid var(--ink); padding-top:8px; font-weight:bold; font-size:.9rem;}
+  .sigcol .role{font-size:.82rem; color:var(--ink-soft);}
+  .scroll-note{display:flex; align-items:center; gap:10px; margin-top:12px; font-size:.88rem; color:var(--ink-soft);}
+  .scroll-note .dot{width:9px; height:9px; border-radius:50%; background:#c9a95e; flex:none;}
+  .scroll-note.done .dot{background:var(--ok);}
+  .agree-row{display:flex; align-items:flex-start; gap:14px; margin-top:18px; padding:16px; border:1px solid var(--line);
+    border-radius:10px; background:#fbf8f2;}
+  .agree-row input{width:26px; height:26px; margin-top:2px; accent-color:var(--accent); flex:none;}
+  .agree-row label{font-size:.97rem;}
+  .agree-row.locked{opacity:.5;}
+  .sig-wrap{border:1px solid var(--line); border-radius:10px; background:#fffdf9; position:relative;}
+  #sigCanvas{width:100%; height:220px; display:block; touch-action:none; border-radius:10px;}
+  .sig-line{position:absolute; left:8%; right:8%; bottom:52px; border-bottom:1px solid #cfc6b6; pointer-events:none;}
+  .sig-x{position:absolute; left:8%; bottom:58px; color:#cfc6b6; font-size:1.1rem; pointer-events:none;}
+  .sig-tools{display:flex; justify-content:space-between; align-items:center; margin-top:10px;}
+  .sig-tools .who{font-size:.88rem; color:var(--ink-soft);}
+  .err{color:var(--error); font-size:.92rem; margin-top:12px; display:none;}
+  .submit-bar{text-align:center; margin-top:8px;}
+  .submit-bar .btn{width:100%; max-width:420px; font-size:1.1rem; padding:18px;}
+  .req-note{font-size:.85rem; color:var(--ink-soft); margin-top:10px; text-align:center;}
+  /* success screen */
+  #successView{display:none; text-align:center; padding:70px 20px;}
+  #successView .bigcheck{width:84px; height:84px; margin:0 auto 26px; border-radius:50%; background:var(--ok);
+    display:flex; align-items:center; justify-content:center;}
+  #successView .bigcheck svg{width:42px; height:42px;}
+  #successView h2{font-family:Georgia,serif; font-weight:normal; font-size:2rem; margin-bottom:12px;}
+  #successView p{color:var(--ink-soft); max-width:460px; margin:0 auto 10px;}
+  #successView .ref{font-family:ui-monospace,Menlo,monospace; background:#f1ece2; display:inline-block;
+    border-radius:8px; padding:8px 16px; margin:14px 0 30px; font-size:1rem;}
+  .spinner{display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.4); border-top-color:#fff;
+    border-radius:50%; animation:spin .8s linear infinite; vertical-align:-4px; margin-right:10px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  footer{ text-align:center; font-size:.78rem; color:#a49a8a; margin-top:30px;}
+  .tl{color:#8a6d3b; font-style:italic; font-size:.86rem;}
+  .privacy-note{font-size:.82rem; color:var(--ink-soft); max-width:460px; margin:0 auto 14px; line-height:1.5;}
+  #idleOverlay{display:none; position:fixed; inset:0; background:rgba(33,29,24,.82); z-index:60;
+    align-items:center; justify-content:center; text-align:center; padding:30px;}
+  #idleOverlay .panel{background:var(--card); border-radius:16px; padding:40px 34px; max-width:420px;}
+  #idleOverlay h3{font-family:Georgia,serif; font-weight:normal; font-size:1.5rem; margin-bottom:10px;}
+  #idleOverlay p{color:var(--ink-soft); margin-bottom:6px;}
+  #idleOverlay .count{font-size:1.6rem; font-family:Georgia,serif; color:var(--accent); margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="formView">
+    <header class="masthead">
+      <div class="crest serif">A</div>
+      <h1>Almario Residence</h1>
+      <div class="tag">Visitor Form</div>
+    </header>
+    <p class="intro">Welcome. All guests, contractors, and service providers are kindly asked to complete this form
+      and sign the confidentiality agreement before entering the premises. Each visitor must complete their own form.</p>
+
+    <!-- STEP 1 -->
+    <section class="step">
+      <div class="step-head"><span class="step-num">STEP 1 OF 4</span><h2>Your details</h2></div>
+      <p class="hint">Please fill in your information exactly as it appears on your government ID.<br>
+        <em class="tl">Punan ang inyong impormasyon ayon sa nakasulat sa inyong ID.</em></p>
+      <label class="f" for="fullName">Full name</label>
+      <input type="text" id="fullName" autocomplete="off" autocapitalize="words" placeholder="e.g. Juan M. Dela Cruz">
+      <label class="f" for="address">Address</label>
+      <input type="text" id="address" autocomplete="off" placeholder="House no., street, barangay, city, province">
+      <label class="f" for="mobile">Mobile number</label>
+      <input type="tel" id="mobile" autocomplete="off" inputmode="tel" placeholder="e.g. 0917 123 4567">
+      <label class="f" for="email">Email address (optional — for your copy of the agreement)</label>
+      <input type="email" id="email" autocomplete="off" inputmode="email" autocapitalize="none" placeholder="you@example.com">
+      <label class="f" for="purpose">Nature / purpose of visit</label>
+      <div class="hint" style="margin-bottom:6px">Tap one, or describe below:</div>
+      <div class="chips" id="chips" style="margin:0 0 10px">
+        <button type="button" class="chip">Delivery</button>
+        <button type="button" class="chip">Repair / Maintenance</button>
+        <button type="button" class="chip">Catering / Event</button>
+        <button type="button" class="chip">Guest</button>
+        <button type="button" class="chip">Construction</button>
+        <button type="button" class="chip">Other</button>
+      </div>
+      <textarea id="purpose" placeholder="Briefly describe the reason for your visit"></textarea>
+      <label class="f" for="idType">Government ID type</label>
+      <select id="idType">
+        <option value="" selected disabled>Select the ID you are presenting…</option>
+        <option>Philippine National ID</option>
+        <option>Driver's License</option>
+        <option>Passport</option>
+        <option>UMID</option>
+        <option>PRC ID</option>
+        <option>Postal ID</option>
+        <option>Voter's ID</option>
+        <option>Other</option>
+      </select>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step">
+      <div class="step-head"><span class="step-num">STEP 2 OF 4</span><h2>Photo of your ID</h2></div>
+      <p class="hint">Take a clear photo of the government ID you selected above. Make sure the name and photo are readable.<br>
+        <em class="tl">Kumuha ng malinaw na litrato ng inyong ID.</em></p>
+      <div class="photo-zone" id="photoZone">
+        <img id="idPreview" alt="ID preview" style="display:none">
+        <p class="privacy-note">Your ID photo is used only to verify your identity and for the security of the residence.
+          It is seen only by the household and kept only for as long as reasonably necessary, as described in the
+          agreement's data-privacy clause.</p>
+        <button type="button" class="btn btn-primary" id="btnPhoto">Take / upload photo of ID</button>
+        <input type="file" id="idFile" accept="image/*" capture="environment" style="display:none">
+        <div id="photoNote" class="hint" style="margin:12px 0 0">No photo captured yet.</div>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step">
+      <div class="step-head"><span class="step-num">STEP 3 OF 4</span><h2>Read the agreement</h2></div>
+      <p class="hint">Please read the entire agreement below. Your details are filled in automatically as you type them above.<br>
+        <em class="tl">Basahin po ang buong kasunduan hanggang sa dulo.</em></p>
+      <div class="nda-panel" id="ndaPanel">
+        <h3>VISITOR, CONTRACTOR, AND SERVICE PROVIDER CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT</h3>
+        <p>KNOW ALL MEN BY THESE PRESENTS:</p>
+        <p>This Confidentiality and Non-Disclosure Agreement is made and entered into by and between:</p>
+        <p><strong>MARGARITA IGNACIA B. NOGRALES-ALMARIO</strong>, Filipino, married to CHEENO MIGUEL D. ALMARIO, of legal age, with address at 16 Solar, Bel Air Village, Makati City, hereinafter referred to as the "DISCLOSING PARTY";</p>
+        <p class="c">- and -</p>
+        <p><span class="m" data-merge="name">[Full Name]</span> of legal age, Filipino, and with address <span class="m" data-merge="address">[Address]</span>, hereinafter referred to as the "RECIPIENT".</p>
+        <p>Both the DISCLOSING PARTY and RECIPIENT shall be collectively referred herein as "PARTIES".</p>
+        <p class="c">WITNESSETH:</p>
+        <p>WHEREAS, the Disclosing Party owns, occupies, or manages a private residence and business offices (herein as referred to for any of the two locations as "Premises"), and the Recipient has been permitted to enter or perform work therein.</p>
+        <p>WHEREAS, the Recipient is within the premises of the Disclosing Party for the purpose of <span class="m" data-merge="purpose">[Purpose of Visit]</span>.</p>
+        <p>WHEREAS, in the course of such engagement, the Recipient may see, hear, or otherwise become aware of private and sensitive information relating to the Disclosing Party and her guests;</p>
+        <p>WHEREAS, the Disclosing Party requires that all such information be kept strictly confidential prior, during or in connection with the Visit or Engagement, and even after the visit or engagement until the immediate removal from the Premises and termination of access or the engagement;</p>
+        <p>NOW, THEREFORE, for and in consideration of the foregoing, the PARTIES hereby agree as follows:</p>
+        <h4>1. CONFIDENTIAL INFORMATION.</h4>
+        <p>"Confidential Information" includes any non-public information observed, heard, received, encountered, or accessed during any visit, entry, engagement, service, work, or activity at or relating to the Premises, including:</p>
+        <ul>
+          <li>The identity, presence, activities, conversations, relationships, and personal circumstances of the Disclosing Party, family members, children, guests, clients, personnel, and other persons found at the Premises during visit or engagement;</li>
+          <li>Photographs, videos, audio recordings, documents, correspondence, communications, and other materials seen or accessed at the Premises during visit or engagement;</li>
+          <li>Engagement, event details, setup, and program of the Disclosing Party;</li>
+          <li>The location, layout, rooms, contents, access points, security arrangements, CCTV placement, passwords, codes, schedules, routines, vehicles, and movements relating to the Premises or its guests and occupants;</li>
+          <li>Personal, family, household, medical, financial, legal, professional, commercial, political, client, and business information;</li>
+          <li>Information concerning any child or minor, including photographs, routines, health, care, location, and activities;</li>
+          <li>Wifi credentials, access keys, gate codes, access cards, and other information obtained or accessed during the visit or engagement; and</li>
+          <li>Any other non-public information seen, heard, received, or learned during the Visit or Engagement, whether or not marked confidential.</li>
+        </ul>
+        <p>All such information is confidential, whether or not labeled as such.</p>
+        <p>For purposes of this Agreement, "Premises" refers to any residence, office, venue, vehicle, temporary location, or other property occupied, used, controlled, or designated by the Disclosing Party. "Visit or Engagement" includes any visit, work, service, delivery, repair, construction, catering, event assistance, consultation, meeting, employment-related activity, or other authorized entry or involvement in general or of any similar nature as enumerated.</p>
+        <h4>2. OBLIGATIONS OF THE RECIPIENT.</h4>
+        <p>The Recipient agrees to:</p>
+        <ul>
+          <li><strong>Strict Non-Disclosure</strong> - Not disclose, release, share, confirm, deny, discuss, or otherwise communicate, directly or indirectly, any Confidential Information to any person or entity, at any time, without the prior written consent of the Disclosing Party.</li>
+          <li><strong>Absolute Prohibition on Recording and Documentation</strong> - Not take, capture, record, store, reproduce, or retain any photographs, videos, audio recordings, screenshots, or any form of documentation of the Premises, the event, persons in the Premises, items and location of the Premises, or any Confidential Information, whether using personal or third-party devices. This includes any uploading of obtained items (photographs, videos, documents, and similar nature) to Artificial Intelligence Tools, cloud services, social media, and any way or form to reach third parties not included in this agreement.</li>
+          <li><strong>No Public or Online Disclosure</strong> - Not post, upload, transmit, or otherwise reference, directly or indirectly, any aspect of the event or Confidential Information on social media, messaging platforms, or any public or private online channels. This includes the obligation that the Recipient shall not disclose or publish any information regarding and relating to children in the location, including photographs, routines, medical information, schooling, whereabouts or any information obtained.</li>
+          <li><strong>Duty of Care and Safeguards</strong> - Exercise the highest degree of care in handling Confidential Information and take all reasonable measures to prevent unauthorized access, disclosure, or misuse.</li>
+          <li><strong>No-Contact</strong> – The Recipient shall not contact members of the family, guests, or household staff outside the scope of the engagement unless expressly authorized.</li>
+        </ul>
+        <h4>3. TERM.</h4>
+        <p>This Agreement shall take effect upon execution and shall apply to the Recipient's present Visit or Engagement and all subsequent visits or engagements involving the Disclosing Party or the Premises, unless replaced or terminated through a later written agreement. The confidentiality obligations shall continue indefinitely after each Visit or Engagement.</p>
+        <h4>4. RETURN OR DELETION.</h4>
+        <p>The Recipient shall immediately delete or surrender any materials containing Confidential Information, if any were created or obtained.</p>
+        <h4>5. BREACH AND LIABILITY.</h4>
+        <p>Any breach of this Agreement shall result in:</p>
+        <ul>
+          <li>Immediate removal from the Premises and termination of the Recipient's access or engagement;</li>
+          <li>Liability for liquidated damages in the amount of Seventy Thousand Pesos (₱70,000.00) for each established breach, subject to applicable law; and</li>
+          <li>The pursuit of injunctive relief, actual damages, and any other civil, criminal, administrative, or equitable remedy available under law.</li>
+        </ul>
+        <p>The Recipient acknowledges that the amount of liquidated damages represents a reasonable pre-estimate of the harm, inconvenience, security risk, and difficulty of precisely determining the damage that may result from a breach, and is not intended merely as a penalty.</p>
+        <h4>6. VOLUNTARY AGREEMENT.</h4>
+        <p>The Recipient hereby acknowledges that he/she has carefully read and fully understood the terms and conditions of this Agreement, and that he/she voluntarily and knowingly agrees to be bound by the same.</p>
+        <p>The Recipient further affirms that this Agreement is entered into freely, without force, intimidation, undue influence, or misrepresentation, and with full awareness of the rights and obligations arising here from.</p>
+        <p>IN WITNESS WHEREOF, the parties have hereunto set their hands this <span class="m filled" id="dateSigned"></span> at Makati City, Philippines.</p>
+        <p>The Recipient agrees that this Agreement may be executed electronically. The Recipient's electronic signature, together with the identifying information, government-issued identification, date and time of submission, and electronic record associated with the execution, shall evidence the Recipient's intent to sign and be bound by this Agreement. An electronically generated or reproduced copy shall be treated as an original for evidentiary purposes, subject to applicable law.</p>
+        <p>The Recipient authorizes the collection and processing of the personal information and identification submitted through this form solely for identity verification, security, administration, enforcement of this Agreement, and related lawful purposes. The information shall be accessible only to authorized persons and retained only for as long as reasonably necessary for such purposes, subject to applicable law.</p>
+        <div class="sigblock">
+          <div class="sigcol">
+            <div class="nm">MARGARITA IGNACIA B. NOGRALES-ALMARIO</div>
+            <div class="role">Disclosing Party</div>
+          </div>
+          <div class="sigcol">
+            <div class="nm"><span class="m" data-merge="name">[Full Name]</span></div>
+            <div class="role">Recipient (signature captured below)</div>
+          </div>
+        </div>
+        <p style="margin-top:14px">Recipient:<br>
+          Mobile number: <span class="m" data-merge="mobile">[Mobile Number]</span><br>
+          Email: <span class="m" data-merge="email">[Email Address]</span><br>
+          ID Type: <span class="m" data-merge="idType">[ID Type]</span></p>
+        <p style="text-align:center; color:#8b8272; font-size:.85rem">Version 1.0 Effective July 24, 2026</p>
+      </div>
+      <div class="scroll-note" id="scrollNote"><span class="dot"></span><span id="scrollNoteTxt">Scroll to the bottom of the agreement to continue.</span></div>
+      <div class="agree-row locked" id="agreeRow">
+        <input type="checkbox" id="agree" disabled>
+        <label for="agree">I confirm that I have read and fully understood the agreement above, and I voluntarily agree to be bound by its terms.</label>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="step">
+      <div class="step-head"><span class="step-num">STEP 4 OF 4</span><h2>Sign here</h2></div>
+      <p class="hint">Using your finger or a stylus, draw your signature in the box below.<br>
+        <em class="tl">Pumirma gamit ang inyong daliri sa loob ng kahon.</em></p>
+      <div class="sig-wrap">
+        <canvas id="sigCanvas"></canvas>
+        <div class="sig-line"></div>
+        <div class="sig-x">✕</div>
+      </div>
+      <div class="sig-tools">
+        <span class="who" id="sigWho">Signing as: —</span>
+        <button type="button" class="btn btn-ghost" id="btnClearSig">Clear signature</button>
+      </div>
+    </section>
+
+    <div class="submit-bar">
+      <div class="err" id="errBox"></div>
+      <button type="button" class="btn btn-primary" id="btnSubmit" disabled>Agree &amp; Sign</button>
+      <p class="req-note" id="reqNote">Complete all steps above to enable submission.</p>
+    </div>
+    <footer>Almario Residence Visitor Management Form · Version 1.0 · Makati City, Philippines</footer>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="successView">
+    <div class="bigcheck"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5.5 5.5L20 6.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h2 class="serif">Thank you, <span id="okName"></span>.</h2>
+    <p>Your agreement has been signed and recorded.<br><strong>You may now enter the premises.</strong></p>
+    <p><strong>Please show this screen to the guard.</strong></p>
+    <p id="okEmailNote">A copy of the signed agreement will be emailed to you.</p>
+    <div class="ref" id="okRef"></div><br>
+    <button type="button" class="btn btn-primary" id="btnNewVisitor">New visitor</button>
+    <p style="margin-top:18px; font-size:.85rem" id="autoResetNote"></p>
+  </div>
+
+  <!-- IDLE OVERLAY -->
+  <div id="idleOverlay">
+    <div class="panel">
+      <h3>Still there?</h3>
+      <p>Tap anywhere to continue.</p>
+      <p>For your privacy, this form will clear itself shortly.</p>
+      <div class="count" id="idleCount">30</div>
+    </div>
+  </div>
+</div>
+
+<script src="vendor/signature_pad.umd.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var state = { idPhoto:null, scrolledNda:false, sigPad:null, submitting:false, autoResetTimer:null };
+
+  /* ---------- live merge ---------- */
+  var mergeMap = { name:"fullName", address:"address", purpose:"purpose", mobile:"mobile", email:"email", idType:"idType" };
+  var placeholders = { name:"[Full Name]", address:"[Address]", purpose:"[Purpose of Visit]", mobile:"[Mobile Number]", email:"[Email Address]", idType:"[ID Type]" };
+  function updateMerges(){
+    Object.keys(mergeMap).forEach(function(key){
+      var v = ($(mergeMap[key]).value || "").trim();
+      document.querySelectorAll('[data-merge="'+key+'"]').forEach(function(el){
+        el.textContent = v || placeholders[key];
+        el.classList.toggle("filled", !!v);
+      });
+    });
+    $("sigWho").textContent = "Signing as: " + (($("fullName").value||"").trim() || "—");
+  }
+  ["fullName","address","mobile","email","purpose"].forEach(function(id){
+    $(id).addEventListener("input", function(){ updateMerges(); refreshSubmit(); });
+  });
+  $("idType").addEventListener("change", function(){ updateMerges(); refreshSubmit(); });
+
+  function ordinal(n){ var s=["th","st","nd","rd"], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+  function manilaDateSigned(){
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Manila",day:"numeric",month:"long",year:"numeric"}).formatToParts(new Date());
+    var get = function(t){ var p=parts.find(function(x){return x.type===t;}); return p?p.value:""; };
+    return ordinal(parseInt(get("day"),10)) + " day of " + get("month") + ", " + get("year");
+  }
+  $("dateSigned").textContent = manilaDateSigned();
+
+  /* ---------- chips (never destroy typed text) ---------- */
+  var chipTexts = Array.prototype.map.call(document.querySelectorAll("#chips .chip"), function(c){ return c.textContent.trim(); });
+  document.querySelectorAll("#chips .chip").forEach(function(chip){
+    chip.addEventListener("click", function(){
+      document.querySelectorAll("#chips .chip").forEach(function(c){ c.classList.remove("on"); });
+      chip.classList.add("on");
+      var t = chip.textContent.trim();
+      var cur = $("purpose").value.trim();
+      var replaceable = cur === "" || chipTexts.indexOf(cur) !== -1;
+      if (t === "Other"){
+        if (replaceable) $("purpose").value = "";
+        $("purpose").focus();
+      } else if (replaceable){
+        $("purpose").value = t;
+      }
+      updateMerges(); refreshSubmit();
+    });
+  });
+
+  /* ---------- ID photo (downscale to max 1600px JPEG) ---------- */
+  $("btnPhoto").addEventListener("click", function(){ $("idFile").click(); });
+  $("idFile").addEventListener("change", function(){
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var url = URL.createObjectURL(f);
+    var img = new Image();
+    img.onload = function(){
+      try{
+        var MAX = 1600;
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var scale = Math.min(1, MAX/Math.max(w,h));
+        var cw = Math.round(w*scale), ch = Math.round(h*scale);
+        var cv = document.createElement("canvas");
+        cv.width = cw; cv.height = ch;
+        cv.getContext("2d").drawImage(img, 0, 0, cw, ch);
+        var dataUrl = cv.toDataURL("image/jpeg", 0.85);
+        state.idPhoto = dataUrl;
+        $("idPreview").src = dataUrl;
+        $("idPreview").style.display = "block";
+        $("photoNote").textContent = "Photo captured. Tap the button to retake if it is blurry.";
+        $("btnPhoto").textContent = "Retake photo";
+      } catch(e){
+        $("photoNote").textContent = "Could not process that image. Please try again.";
+      } finally {
+        URL.revokeObjectURL(url);
+        refreshSubmit();
+      }
+    };
+    img.onerror = function(){
+      URL.revokeObjectURL(url);
+      $("photoNote").textContent = "That file could not be read as an image. Please try again.";
+    };
+    img.src = url;
+    this.value = "";
+  });
+
+  /* ---------- NDA scroll gate ---------- */
+  var panel = $("ndaPanel");
+  function checkScrolled(){
+    if (state.scrolledNda) return;
+    var atBottom = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 24;
+    var noOverflow = panel.scrollHeight <= panel.clientHeight + 4;
+    if (atBottom || noOverflow){
+      state.scrolledNda = true;
+      $("agree").disabled = false;
+      $("agreeRow").classList.remove("locked");
+      $("scrollNote").classList.add("done");
+      $("scrollNoteTxt").textContent = "You have reached the end of the agreement.";
+      refreshSubmit();
+    }
+  }
+  panel.addEventListener("scroll", checkScrolled, {passive:true});
+  window.addEventListener("load", checkScrolled);
+  $("agree").addEventListener("change", refreshSubmit);
+
+  /* ---------- signature pad ---------- */
+  var canvas = $("sigCanvas");
+  try {
+    if (typeof SignaturePad === "undefined") throw new Error("SignaturePad script did not load");
+    state.sigPad = new SignaturePad(canvas, { penColor: "#1c2733", minWidth: 1.1, maxWidth: 2.6 });
+  } catch (e) {
+    var sw = document.querySelector(".sig-wrap");
+    if (sw) sw.innerHTML = '<p style="padding:24px; color:var(--error); text-align:center;">The signature box could not load. Please refresh this page, or ask the guard or a member of the household for help.</p>';
+    state.sigPad = { isEmpty: function(){ return true; }, clear: function(){}, toData: function(){ return []; }, fromData: function(){}, toDataURL: function(){ return ""; }, addEventListener: function(){} };
+  }
+  function resizeCanvas(){
+    var ratio = Math.max(window.devicePixelRatio || 1, 1);
+    var data = state.sigPad.toData();
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext("2d").scale(ratio, ratio);
+    state.sigPad.clear();
+    if (data && data.length) state.sigPad.fromData(data);
+  }
+  window.addEventListener("resize", resizeCanvas);
+  window.addEventListener("orientationchange", function(){ setTimeout(resizeCanvas, 250); });
+  resizeCanvas();
+  state.sigPad.addEventListener("endStroke", refreshSubmit);
+  $("btnClearSig").addEventListener("click", function(){ state.sigPad.clear(); refreshSubmit(); });
+
+  /* ---------- validation / submit ---------- */
+  function fieldValues(){
+    return {
+      fullName: $("fullName").value.trim(),
+      address: $("address").value.trim(),
+      mobile: $("mobile").value.trim(),
+      email: $("email").value.trim(),
+      purpose: $("purpose").value.trim(),
+      idType: $("idType").value || ""
+    };
+  }
+  function missing(){
+    var v = fieldValues(), out = [];
+    if (v.fullName.length < 2) out.push("full name");
+    if (v.address.length < 5) out.push("address");
+    if (!/^[+\d][\d\s()-]{6,}$/.test(v.mobile)) out.push("mobile number");
+    if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email)) out.push("a valid email address (or leave it blank)");
+    if (v.purpose.length < 2) out.push("purpose of visit");
+    if (!v.idType) out.push("ID type");
+    if (!state.idPhoto) out.push("a photo of your ID in Step 2");
+    if (!$("agree").checked) out.push("tick the agreement box in Step 3");
+    if (state.sigPad.isEmpty()) out.push("your signature in Step 4");
+    return out;
+  }
+  function refreshSubmit(){
+    var m = missing();
+    $("btnSubmit").disabled = m.length > 0 || state.submitting;
+    $("reqNote").textContent = m.length ? "Still needed: " + m.join(", ") + "." : "Everything is complete. Tap the button to sign in.";
+  }
+  refreshSubmit();
+
+  $("btnSubmit").addEventListener("click", function(){
+    if (state.submitting) return;
+    var m = missing();
+    if (m.length){ refreshSubmit(); return; }
+    state.submitting = true;
+    var btn = $("btnSubmit");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Recording your agreement… please keep this screen open.';
+    $("errBox").style.display = "none";
+
+    var v = fieldValues();
+    var payload = {
+      fullName: v.fullName, address: v.address, mobile: v.mobile, email: v.email,
+      purpose: v.purpose, idType: v.idType, agreed: $("agree").checked,
+      signature: state.sigPad.toDataURL("image/png"),
+      idPhoto: state.idPhoto
+    };
+    fetch("/api/submit", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(function(r){ return r.json().then(function(j){ return {status:r.status, body:j}; }); })
+      .then(function(res){
+        if (res.status === 200 && res.body && res.body.ok){
+          showSuccess(v.fullName, res.body, !v.email);
+        } else {
+          throw new Error((res.body && res.body.error) || "Submission failed. Please try again.");
+        }
+      })
+      .catch(function(e){
+        var msg;
+        if (e instanceof TypeError){
+          msg = "Could not connect to the internet. Your answers are still on this screen — please check the WiFi and tap Agree & Sign again, or ask the guard for help.";
+        } else {
+          msg = e.message || "Something went wrong. Your answers are still on this screen — please try again, or ask the guard or a member of the household for help.";
+        }
+        $("errBox").textContent = msg;
+        $("errBox").style.display = "block";
+      })
+      .finally(function(){
+        state.submitting = false;
+        btn.innerHTML = "Agree &amp; Sign";
+        refreshSubmit();
+      });
+  });
+
+  /* ---------- success / kiosk reset ---------- */
+  function showSuccess(name, resp, noEmail){
+    $("okName").textContent = name.split(" ")[0] || name;
+    $("okRef").textContent = "Reference: " + resp.id;
+    $("okEmailNote").textContent = noEmail
+      ? "Ask the household if you'd like a copy of the signed agreement."
+      : "A copy of the signed agreement will be emailed to you.";
+    $("formView").style.display = "none";
+    $("successView").style.display = "block";
+    window.scrollTo(0,0);
+    var secs = 30;
+    $("autoResetNote").textContent = "This screen will reset for the next visitor in " + secs + " seconds.";
+    state.autoResetTimer = setInterval(function(){
+      secs--;
+      if (secs <= 0){ resetForm(); return; }
+      $("autoResetNote").textContent = "This screen will reset for the next visitor in " + secs + " seconds.";
+    }, 1000);
+  }
+  function resetForm(){
+    if (state.autoResetTimer){ clearInterval(state.autoResetTimer); state.autoResetTimer = null; }
+    ["fullName","address","mobile","email","purpose"].forEach(function(id){ $(id).value = ""; });
+    $("idType").selectedIndex = 0;
+    document.querySelectorAll("#chips .chip").forEach(function(c){ c.classList.remove("on"); });
+    state.idPhoto = null;
+    $("idPreview").style.display = "none"; $("idPreview").src = "";
+    $("photoNote").textContent = "No photo captured yet.";
+    $("btnPhoto").textContent = "Take / upload photo of ID";
+    state.scrolledNda = false;
+    panel.scrollTop = 0;
+    $("agree").checked = false; $("agree").disabled = true;
+    $("agreeRow").classList.add("locked");
+    $("scrollNote").classList.remove("done");
+    $("scrollNoteTxt").textContent = "Scroll to the bottom of the agreement to continue.";
+    state.sigPad.clear();
+    $("errBox").style.display = "none";
+    $("successView").style.display = "none";
+    $("formView").style.display = "block";
+    updateMerges(); refreshSubmit();
+    window.scrollTo(0,0);
+    setTimeout(resizeCanvas, 50);
+    setTimeout(checkScrolled, 100);
+  }
+  $("btnNewVisitor").addEventListener("click", resetForm);
+
+  /* ---------- idle timeout: clear PII after 4 min inactivity + 30s warning ---------- */
+  var IDLE_MS = 4 * 60 * 1000;
+  var lastActivity = Date.now();
+  var idleCountTimer = null;
+  function hideIdleOverlay(){
+    $("idleOverlay").style.display = "none";
+    if (idleCountTimer){ clearInterval(idleCountTimer); idleCountTimer = null; }
+  }
+  function activity(){
+    lastActivity = Date.now();
+    if ($("idleOverlay").style.display === "flex") hideIdleOverlay();
+  }
+  ["touchstart","pointerdown","mousedown","keydown","input","scroll"].forEach(function(ev){
+    window.addEventListener(ev, activity, { passive: true, capture: true });
+  });
+  setInterval(function(){
+    if (state.submitting){ lastActivity = Date.now(); return; }
+    if ($("successView").style.display === "block") return; // success screen has its own auto-reset
+    if ($("idleOverlay").style.display === "flex") return;
+    if (Date.now() - lastActivity < IDLE_MS) return;
+    var dirty = ["fullName","address","mobile","email","purpose"].some(function(id){ return $(id).value.trim() !== ""; })
+      || !!state.idPhoto || !state.sigPad.isEmpty() || $("agree").checked;
+    if (!dirty){ lastActivity = Date.now(); return; }
+    var secs = 30;
+    $("idleCount").textContent = secs;
+    $("idleOverlay").style.display = "flex";
+    idleCountTimer = setInterval(function(){
+      secs--;
+      $("idleCount").textContent = secs;
+      if (secs <= 0){ hideIdleOverlay(); resetForm(); }
+    }, 1000);
+  }, 5000);
+
+  updateMerges();
+})();
+</script>
+</body>
+</html>

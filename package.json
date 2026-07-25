@@ -1,0 +1,16 @@
+{
+  "name": "almario-visitor-form",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Almario Residence Visitor Management Form - digital NDA signing kiosk",
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0",
+    "@netlify/functions": "^2.8.2",
+    "nodemailer": "^6.9.16",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "signature_pad": "^4.1.7"
+  }
+}

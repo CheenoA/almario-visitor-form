@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Almario Residence Visitor Form — Admin</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{ --paper:#faf7f2; --card:#fff; --ink:#211d18; --soft:#5c554b; --line:#e4ddd2;
+    --accent:#8a6d3b; --error:#a03e2d; --ok:#3d6b4f; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--paper); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; line-height:1.5;}
+  .wrap{max-width:1020px; margin:0 auto; padding:30px 18px 60px;}
+  h1{font-family:Georgia,serif; font-weight:normal; font-size:1.6rem;}
+  .sub{color:var(--soft); font-size:.88rem; margin-bottom:26px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:22px; box-shadow:0 1px 3px rgba(60,50,30,.05);}
+  input[type=password]{font-size:1.2rem; padding:13px; border:1px solid var(--line); border-radius:9px; width:230px; letter-spacing:.3em; text-align:center;}
+  input:focus{outline:none; border-color:var(--accent);}
+  .btn{border:none; border-radius:8px; padding:11px 18px; font-size:.93rem; cursor:pointer; font-family:inherit;}
+  .btn-p{background:var(--accent); color:#fff;}
+  .btn-g{background:transparent; border:1px solid var(--accent); color:var(--accent);}
+  .btn-d{background:transparent; border:1px solid var(--error); color:var(--error);}
+  .btn:disabled{opacity:.45; cursor:default;}
+  .btn-sm{padding:7px 12px; font-size:.83rem; border-radius:7px;}
+  #loginErr{color:var(--error); margin-top:12px; display:none;}
+  table{width:100%; border-collapse:collapse; font-size:.9rem;}
+  th{text-align:left; font-size:.74rem; text-transform:uppercase; letter-spacing:.07em; color:var(--soft);
+     border-bottom:1px solid var(--line); padding:8px 10px;}
+  td{border-bottom:1px solid #efe9df; padding:11px 10px; vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .id-mono{font-family:ui-monospace,Menlo,monospace; font-size:.78rem; color:var(--soft);}
+  .status{display:inline-block; border-radius:999px; padding:2px 10px; font-size:.76rem;}
+  .status.sent{background:#e2eee6; color:var(--ok);}
+  .status.pending{background:#f4ecd9; color:#8a6d3b;}
+  .status.failed{background:#f6e3de; color:var(--error);}
+  .row-actions{display:flex; gap:7px; flex-wrap:wrap;}
+  .toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; flex-wrap:wrap;}
+  #msg{font-size:.86rem; color:var(--soft);}
+  .filters{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:14px;}
+  #search{font-size:.95rem; padding:9px 12px; border:1px solid var(--line); border-radius:8px; min-width:220px;}
+  #search:focus{outline:none; border-color:var(--accent);}
+  .pill{border:1px solid var(--line); background:#fbf8f2; border-radius:999px; padding:7px 14px; font-size:.83rem;
+    color:var(--soft); cursor:pointer;}
+  .pill.on{background:var(--accent); border-color:var(--accent); color:#fff;}
+  #adminView{display:none;}
+  .empty{padding:34px; text-align:center; color:var(--soft);}
+  @media (max-width:700px){ .hide-sm{display:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Almario Residence Visitor Form</h1>
+  <div class="sub">Administration — signed visitor agreements</div>
+
+  <div class="card" id="loginView" style="max-width:420px; text-align:center; padding:34px;">
+    <p style="margin-bottom:16px;">Enter the admin passcode to continue.</p>
+    <input type="password" id="passcode" inputmode="numeric" autocomplete="off" placeholder="••••••••">
+    <div style="margin-top:18px;"><button class="btn btn-p" id="btnLogin" style="width:230px; padding:13px;">Unlock</button></div>
+    <div id="loginErr"></div>
+  </div>
+
+  <div id="adminView">
+    <div class="card">
+      <div class="toolbar">
+        <span id="msg">Loading…</span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-g btn-sm" id="btnExport">Export CSV</button>
+          <button class="btn btn-g btn-sm" id="btnRefresh">Refresh</button>
+        </div>
+      </div>
+      <div class="filters">
+        <input type="text" id="search" placeholder="Search name, purpose, or ID…" autocomplete="off">
+        <button class="pill" data-range="today">Today</button>
+        <button class="pill" data-range="7d">Last 7 days</button>
+        <button class="pill on" data-range="all">All</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="tbl">
+          <thead><tr>
+            <th>Visitor</th><th>Purpose</th><th class="hide-sm">Signed (Manila)</th><th>Email</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="empty" style="display:none;">No submissions yet.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var passcode = null; // in-memory only; re-enter on reload
+  var $ = function(id){ return document.getElementById(id); };
+
+  function api(path, opts){
+    opts = opts || {};
+    opts.headers = Object.assign({}, opts.headers, { "x-admin-passcode": passcode });
+    return fetch("/api/admin/" + path, opts).then(function(r){
+      if (r.status === 401) throw new Error("Unauthorized. Reload the page and re-enter the passcode.");
+      return r;
+    });
+  }
+
+  $("btnLogin").addEventListener("click", doLogin);
+  $("passcode").addEventListener("keydown", function(e){ if (e.key === "Enter") doLogin(); });
+
+  function doLogin(){
+    var pc = $("passcode").value.trim();
+    if (!pc) return;
+    $("btnLogin").disabled = true;
+    $("loginErr").style.display = "none";
+    fetch("/api/admin/login", { method:"POST", headers: { "x-admin-passcode": pc } })
+      .then(function(r){
+        if (r.status === 200){
+          passcode = pc;
+          $("loginView").style.display = "none";
+          $("adminView").style.display = "block";
+          load();
+        } else if (r.status === 503){
+          throw new Error("Server is missing the ADMIN_PASSCODE configuration.");
+        } else {
+          throw new Error("Incorrect passcode.");
+        }
+      })
+      .catch(function(e){
+        $("loginErr").textContent = e.message; $("loginErr").style.display = "block";
+      })
+      .finally(function(){ $("btnLogin").disabled = false; });
+  }
+
+  $("btnRefresh").addEventListener("click", load);
+
+  function esc(s){ var d = document.createElement("div"); d.textContent = String(s == null ? "" : s); return d.innerHTML; }
+
+  function statusPill(st){
+    st = String(st || "unknown");
+    var label = st === "sent" ? "sent"
+      : (st.indexOf("pending") === 0 ? "pending"
+      : (st.indexOf("queued") === 0 ? "queued" : "failed"));
+    var cls = label === "sent" ? "sent" : (label === "failed" ? "failed" : "pending");
+    return '<span class="status ' + cls + '" title="' + esc(st) + '">' + label + '</span>';
+  }
+
+  /* ---------- client-side filtering ---------- */
+  var allSubs = [];
+  var range = "all";
+  $("search").addEventListener("input", render);
+  document.querySelectorAll(".pill").forEach(function(p){
+    p.addEventListener("click", function(){
+      document.querySelectorAll(".pill").forEach(function(x){ x.classList.remove("on"); });
+      p.classList.add("on");
+      range = p.getAttribute("data-range");
+      render();
+    });
+  });
+
+  function filtered(){
+    var q = $("search").value.trim().toLowerCase();
+    var now = new Date();
+    var startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    var start7d = now.getTime() - 7 * 24 * 3600 * 1000;
+    return allSubs.filter(function(s){
+      if (q){
+        var hay = (String(s.fullName||"") + " " + String(s.purpose||"") + " " + String(s.id||"")).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      if (range !== "all"){
+        var t = Date.parse(s.submittedAtISO || "");
+        if (isNaN(t)) return false;
+        if (range === "today" && t < startToday) return false;
+        if (range === "7d" && t < start7d) return false;
+      }
+      return true;
+    });
+  }
+
+  function csvCell(v){ v = String(v == null ? "" : v); return '"' + v.replace(/"/g, '""') + '"'; }
+  $("btnExport").addEventListener("click", function(){
+    var rows = filtered();
+    var lines = ["Name,Purpose,ID Type,Signed At (Manila),Email Status,Submission ID"];
+    rows.forEach(function(s){
+      lines.push([s.fullName, s.purpose, s.idType, s.submittedAtManila, s.emailStatus, s.id].map(csvCell).join(","));
+    });
+    var blob = new Blob([lines.join("\r\n")], { type: "text/csv" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "almario-visitor-submissions.csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 20000);
+  });
+
+  function load(){
+    $("msg").textContent = "Loading…";
+    api("submissions").then(function(r){ return r.json(); }).then(function(j){
+      if (!j.ok) throw new Error(j.error || "Failed to load.");
+      allSubs = j.submissions || [];
+      render();
+    }).catch(function(e){
+      $("msg").textContent = e.message;
+    });
+  }
+
+  function render(){
+      var subs = filtered();
+      var rows = $("rows"); rows.innerHTML = "";
+      $("empty").style.display = subs.length ? "none" : "block";
+      $("msg").textContent = subs.length + " of " + allSubs.length + " submission" + (allSubs.length === 1 ? "" : "s") + " shown";
+      subs.forEach(function(s){
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td><strong>" + esc(s.fullName) + "</strong><br><span class='id-mono'>" + esc(s.id) + "</span><br>" +
+            "<span style='font-size:.8rem;color:var(--soft)'>" + esc(s.email) + " · " + esc(s.mobile) + "</span></td>" +
+          "<td>" + esc(s.purpose) + "<br><span style='font-size:.8rem;color:var(--soft)'>" + esc(s.idType) + "</span></td>" +
+          "<td class='hide-sm'>" + esc(s.submittedAtManila || "") + "</td>" +
+          "<td>" + statusPill(s.emailStatus) + "</td>" +
+          "<td><div class='row-actions'>" +
+            "<button class='btn btn-g btn-sm' data-act='pdf'>PDF</button>" +
+            "<button class='btn btn-g btn-sm' data-act='id'>ID photo</button>" +
+            "<button class='btn btn-g btn-sm' data-act='resend'>Resend email</button>" +
+            "<button class='btn btn-d btn-sm' data-act='del'>Delete</button>" +
+          "</div></td>";
+        tr.querySelectorAll("button[data-act]").forEach(function(b){
+          b.addEventListener("click", function(){ act(b.getAttribute("data-act"), s, b); });
+        });
+        rows.appendChild(tr);
+      });
+  }
+
+  function downloadBlob(resp, filename){
+    return resp.blob().then(function(b){
+      var url = URL.createObjectURL(b);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename || "";
+      if (!filename) a.target = "_blank";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 20000);
+    });
+  }
+
+  function act(kind, s, btn){
+    btn.disabled = true;
+    var done = function(){ btn.disabled = false; };
+    if (kind === "pdf"){
+      api("pdf/" + s.id).then(function(r){
+        if (!r.ok) throw new Error("PDF not found.");
+        return downloadBlob(r, "Almario-Residence-NDA-" + s.id + ".pdf");
+      }).catch(alertErr).finally(done);
+    } else if (kind === "id"){
+      api("id/" + s.id).then(function(r){
+        if (!r.ok) throw new Error("ID photo not found.");
+        return r.blob().then(function(b){
+          var url = URL.createObjectURL(b);
+          window.open(url, "_blank");
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+        });
+      }).catch(alertErr).finally(done);
+    } else if (kind === "resend"){
+      btn.textContent = "Sending…";
+      api("resend/" + s.id, { method:"POST" }).then(function(r){ return r.json(); }).then(function(j){
+        if (!j.ok) throw new Error(j.error || "Resend failed.");
+        alert("Email status: " + j.emailStatus);
+        load();
+      }).catch(alertErr).finally(function(){ btn.textContent = "Resend email"; done(); });
+    } else if (kind === "del"){
+      if (!confirm("Delete submission " + s.id + " (" + s.fullName + ")? This removes the PDF, ID photo, and record permanently.")){ done(); return; }
+      api("submission/" + s.id, { method:"DELETE" }).then(function(r){ return r.json(); }).then(function(j){
+        if (!j.ok) throw new Error(j.error || "Delete failed.");
+        load();
+      }).catch(alertErr).finally(done);
+    }
+  }
+  function alertErr(e){ alert(e.message || String(e)); }
+})();
+</script>
+</body>
+</html>
