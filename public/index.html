@@ -98,6 +98,13 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   footer{ text-align:center; font-size:.78rem; color:#a49a8a; margin-top:30px;}
   .tl{color:#8a6d3b; font-style:italic; font-size:.86rem;}
+  .witness-lines{display:flex; gap:40px; flex-wrap:wrap; margin:18px 0 16px; font-family:Georgia,serif;}
+  .ack-block{border-top:1px dashed var(--line); margin-top:22px; padding-top:18px;}
+  .ack-table{width:100%; border-collapse:collapse; margin:12px 0 14px; font-size:.9rem;}
+  .ack-table th,.ack-table td{border:1px solid #cfc6b6; padding:8px 10px; text-align:left; vertical-align:top;}
+  .event-line{background:#f3eee4; border:1px solid var(--line); border-radius:8px; padding:10px 14px;
+    font-size:.95rem; margin-bottom:12px;}
+  .event-line strong{color:var(--accent-dark);}
   .privacy-note{font-size:.82rem; color:var(--ink-soft); max-width:460px; margin:0 auto 14px; line-height:1.5;}
   #idleOverlay{display:none; position:fixed; inset:0; background:rgba(33,29,24,.82); z-index:60;
     align-items:center; justify-content:center; text-align:center; padding:30px;}
@@ -154,6 +161,12 @@
         <option>Voter's ID</option>
         <option>Other</option>
       </select>
+      <div id="manualEventFields" style="display:none">
+        <label class="f" for="evName">Event name</label>
+        <input type="text" id="evName" autocomplete="off" placeholder="e.g. Birthday Dinner">
+        <label class="f" for="evDate">Event date</label>
+        <input type="text" id="evDate" autocomplete="off" placeholder="e.g. July 30, 2026">
+      </div>
     </section>
 
     <!-- STEP 2 -->
@@ -177,8 +190,9 @@
       <div class="step-head"><span class="step-num">STEP 3 OF 4</span><h2>Read the agreement</h2></div>
       <p class="hint">Please read the entire agreement below. Your details are filled in automatically as you type them above.<br>
         <em class="tl">Basahin po ang buong kasunduan hanggang sa dulo.</em></p>
+      <p class="event-line" id="eventLine" style="display:none"><strong>Event:</strong> <span id="eventLineTxt"></span></p>
       <div class="nda-panel" id="ndaPanel">
-        <h3>VISITOR, CONTRACTOR, AND SERVICE PROVIDER CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT</h3>
+        <h3>CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT</h3>
         <p>KNOW ALL MEN BY THESE PRESENTS:</p>
         <p>This Confidentiality and Non-Disclosure Agreement is made and entered into by and between:</p>
         <p><strong>MARGARITA IGNACIA B. NOGRALES-ALMARIO</strong>, Filipino, married to CHEENO MIGUEL D. ALMARIO, of legal age, with address at 16 Solar, Bel Air Village, Makati City, hereinafter referred to as the "DISCLOSING PARTY";</p>
@@ -186,52 +200,45 @@
         <p><span class="m" data-merge="name">[Full Name]</span> of legal age, Filipino, and with address <span class="m" data-merge="address">[Address]</span>, hereinafter referred to as the "RECIPIENT".</p>
         <p>Both the DISCLOSING PARTY and RECIPIENT shall be collectively referred herein as "PARTIES".</p>
         <p class="c">WITNESSETH:</p>
-        <p>WHEREAS, the Disclosing Party owns, occupies, or manages a private residence and business offices (herein as referred to for any of the two locations as "Premises"), and the Recipient has been permitted to enter or perform work therein.</p>
-        <p>WHEREAS, the Recipient is within the premises of the Disclosing Party for the purpose of <span class="m" data-merge="purpose">[Purpose of Visit]</span>.</p>
+        <p>WHEREAS, the Disclosing Party is hosting a private <span class="m" data-merge="eventName">[Event Name]</span> event on <span class="m" data-merge="eventDate">[Event Date]</span>;</p>
+        <p>WHEREAS, the Recipient has been engaged to provide catering and/or service assistance for the said event;</p>
         <p>WHEREAS, in the course of such engagement, the Recipient may see, hear, or otherwise become aware of private and sensitive information relating to the Disclosing Party and her guests;</p>
-        <p>WHEREAS, the Disclosing Party requires that all such information be kept strictly confidential prior, during or in connection with the Visit or Engagement, and even after the visit or engagement until the immediate removal from the Premises and termination of access or the engagement;</p>
+        <p>WHEREAS, the Disclosing Party requires that all such information be kept strictly confidential;</p>
         <p>NOW, THEREFORE, for and in consideration of the foregoing, the PARTIES hereby agree as follows:</p>
         <h4>1. CONFIDENTIAL INFORMATION.</h4>
-        <p>"Confidential Information" includes any non-public information observed, heard, received, encountered, or accessed during any visit, entry, engagement, service, work, or activity at or relating to the Premises, including:</p>
-        <ul>
-          <li>The identity, presence, activities, conversations, relationships, and personal circumstances of the Disclosing Party, family members, children, guests, clients, personnel, and other persons found at the Premises during visit or engagement;</li>
-          <li>Photographs, videos, audio recordings, documents, correspondence, communications, and other materials seen or accessed at the Premises during visit or engagement;</li>
-          <li>Engagement, event details, setup, and program of the Disclosing Party;</li>
-          <li>The location, layout, rooms, contents, access points, security arrangements, CCTV placement, passwords, codes, schedules, routines, vehicles, and movements relating to the Premises or its guests and occupants;</li>
-          <li>Personal, family, household, medical, financial, legal, professional, commercial, political, client, and business information;</li>
-          <li>Information concerning any child or minor, including photographs, routines, health, care, location, and activities;</li>
-          <li>Wifi credentials, access keys, gate codes, access cards, and other information obtained or accessed during the visit or engagement; and</li>
-          <li>Any other non-public information seen, heard, received, or learned during the Visit or Engagement, whether or not marked confidential.</li>
-        </ul>
+        <p>"Confidential Information" includes any non-public information observed, heard, or accessed during the event, including:</p>
+        <ol type="a">
+          <li>Identities of guests and attendees</li>
+          <li>Conversations, interactions, and activities</li>
+          <li>Photos, videos, or recordings of the event</li>
+          <li>Event details, setup, and program</li>
+          <li>Any personal or private matters involving the Host or guests</li>
+        </ol>
         <p>All such information is confidential, whether or not labeled as such.</p>
-        <p>For purposes of this Agreement, "Premises" refers to any residence, office, venue, vehicle, temporary location, or other property occupied, used, controlled, or designated by the Disclosing Party. "Visit or Engagement" includes any visit, work, service, delivery, repair, construction, catering, event assistance, consultation, meeting, employment-related activity, or other authorized entry or involvement in general or of any similar nature as enumerated.</p>
         <h4>2. OBLIGATIONS OF THE RECIPIENT.</h4>
         <p>The Recipient agrees to:</p>
-        <ul>
+        <ol type="a">
           <li><strong>Strict Non-Disclosure</strong> - Not disclose, release, share, confirm, deny, discuss, or otherwise communicate, directly or indirectly, any Confidential Information to any person or entity, at any time, without the prior written consent of the Disclosing Party.</li>
-          <li><strong>Absolute Prohibition on Recording and Documentation</strong> - Not take, capture, record, store, reproduce, or retain any photographs, videos, audio recordings, screenshots, or any form of documentation of the Premises, the event, persons in the Premises, items and location of the Premises, or any Confidential Information, whether using personal or third-party devices. This includes any uploading of obtained items (photographs, videos, documents, and similar nature) to Artificial Intelligence Tools, cloud services, social media, and any way or form to reach third parties not included in this agreement.</li>
-          <li><strong>No Public or Online Disclosure</strong> - Not post, upload, transmit, or otherwise reference, directly or indirectly, any aspect of the event or Confidential Information on social media, messaging platforms, or any public or private online channels. This includes the obligation that the Recipient shall not disclose or publish any information regarding and relating to children in the location, including photographs, routines, medical information, schooling, whereabouts or any information obtained.</li>
+          <li><strong>Absolute Prohibition on Recording and Documentation</strong> - Not take, capture, record, store, reproduce, or retain any photographs, videos, audio recordings, screenshots, or any form of documentation of the event or any Confidential Information, whether using personal or third-party devices.</li>
+          <li><strong>No Public or Online Disclosure</strong> - Not post, upload, transmit, or otherwise reference, directly or indirectly, any aspect of the event or Confidential Information on social media, messaging platforms, or any public or private online channels.</li>
           <li><strong>Duty of Care and Safeguards</strong> - Exercise the highest degree of care in handling Confidential Information and take all reasonable measures to prevent unauthorized access, disclosure, or misuse.</li>
-          <li><strong>No-Contact</strong> – The Recipient shall not contact members of the family, guests, or household staff outside the scope of the engagement unless expressly authorized.</li>
-        </ul>
+        </ol>
         <h4>3. TERM.</h4>
-        <p>This Agreement shall take effect upon execution and shall apply to the Recipient's present Visit or Engagement and all subsequent visits or engagements involving the Disclosing Party or the Premises, unless replaced or terminated through a later written agreement. The confidentiality obligations shall continue indefinitely after each Visit or Engagement.</p>
+        <p>This Agreement shall take effect on <span class="m filled nda-date-signed"></span> and shall continue indefinitely, even after the event.</p>
         <h4>4. RETURN OR DELETION.</h4>
         <p>The Recipient shall immediately delete or surrender any materials containing Confidential Information, if any were created or obtained.</p>
         <h4>5. BREACH AND LIABILITY.</h4>
-        <p>Any breach of this Agreement shall result in:</p>
-        <ul>
-          <li>Immediate removal from the Premises and termination of the Recipient's access or engagement;</li>
-          <li>Liability for liquidated damages in the amount of Seventy Thousand Pesos (₱70,000.00) for each established breach, subject to applicable law; and</li>
-          <li>The pursuit of injunctive relief, actual damages, and any other civil, criminal, administrative, or equitable remedy available under law.</li>
-        </ul>
-        <p>The Recipient acknowledges that the amount of liquidated damages represents a reasonable pre-estimate of the harm, inconvenience, security risk, and difficulty of precisely determining the damage that may result from a breach, and is not intended merely as a penalty.</p>
+        <p>Any breach of this Agreement shall:</p>
+        <ol type="a">
+          <li>Result in immediate removal from the event; and</li>
+          <li>Make the Recipient liable for liquidated damages of ₱50,000.00, without prejudice to other legal remedies.</li>
+        </ol>
         <h4>6. VOLUNTARY AGREEMENT.</h4>
         <p>The Recipient hereby acknowledges that he/she has carefully read and fully understood the terms and conditions of this Agreement, and that he/she voluntarily and knowingly agrees to be bound by the same.</p>
-        <p>The Recipient further affirms that this Agreement is entered into freely, without force, intimidation, undue influence, or misrepresentation, and with full awareness of the rights and obligations arising here from.</p>
-        <p>IN WITNESS WHEREOF, the parties have hereunto set their hands this <span class="m filled" id="dateSigned"></span> at Makati City, Philippines.</p>
+        <p>The Recipient further affirms that this Agreement is entered into freely, without force, intimidation, undue influence, or misrepresentation, and with full awareness of the rights and obligations arising herefrom.</p>
         <p>The Recipient agrees that this Agreement may be executed electronically. The Recipient's electronic signature, together with the identifying information, government-issued identification, date and time of submission, and electronic record associated with the execution, shall evidence the Recipient's intent to sign and be bound by this Agreement. An electronically generated or reproduced copy shall be treated as an original for evidentiary purposes, subject to applicable law.</p>
         <p>The Recipient authorizes the collection and processing of the personal information and identification submitted through this form solely for identity verification, security, administration, enforcement of this Agreement, and related lawful purposes. The information shall be accessible only to authorized persons and retained only for as long as reasonably necessary for such purposes, subject to applicable law.</p>
+        <p>IN WITNESS WHEREOF, the parties have hereunto set their hands this <span class="m filled nda-date-signed"></span> at Makati City, Philippines.</p>
         <div class="sigblock">
           <div class="sigcol">
             <div class="nm">MARGARITA IGNACIA B. NOGRALES-ALMARIO</div>
@@ -242,11 +249,26 @@
             <div class="role">Recipient (signature captured below)</div>
           </div>
         </div>
-        <p style="margin-top:14px">Recipient:<br>
-          Mobile number: <span class="m" data-merge="mobile">[Mobile Number]</span><br>
-          Email: <span class="m" data-merge="email">[Email Address]</span><br>
-          ID Type: <span class="m" data-merge="idType">[ID Type]</span></p>
-        <p style="text-align:center; color:#8b8272; font-size:.85rem">Version 1.0 Effective July 24, 2026</p>
+        <p style="margin-top:18px">Signed in the presence of witnesses<br>(Signature over printed name):</p>
+        <div class="witness-lines">
+          <span>_________________________</span>
+          <span>_________________________</span>
+        </div>
+        <div class="ack-block">
+          <h4 style="text-align:center">ACKNOWLEDGMENT</h4>
+          <p style="margin-bottom:4px">Republic of the Philippines&nbsp;&nbsp;)<br>
+          City of Makati&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) S.S.<br>
+          x--------------------------------------------x</p>
+          <p>BEFORE ME, a Notary Public for and in Makati City, Philippines, on ____________________, personally came and appeared the following parties, with their competent evidence of identity:</p>
+          <table class="ack-table">
+            <tr><th>NAME</th><th>Competent Evidence of Identity</th></tr>
+            <tr><td>MARGARITA IGNACIA B. NOGRALES-ALMARIO</td><td>Driver's License with License No.B04-07-005555 valid until 29 September 2034</td></tr>
+            <tr><td><span class="m" data-merge="name">[Full Name]</span></td><td><span class="m" data-merge="idType">[ID Type]</span> (photo on file)</td></tr>
+          </table>
+          <p>All known to me, and to me known to be the same persons who executed the foregoing Confidentiality and Non-Disclosure Agreement, consisting of three (3) pages, including this Acknowledgment, and acknowledged to me that the same is their free and voluntary act and deed.</p>
+          <p>Doc No. ___;<br>Page No. ___;<br>Book No. ___;<br>Series of 2026.</p>
+        </div>
+        <p style="text-align:center; color:#8b8272; font-size:.85rem">Version 2.0 Effective July 25, 2026</p>
       </div>
       <div class="scroll-note" id="scrollNote"><span class="dot"></span><span id="scrollNoteTxt">Scroll to the bottom of the agreement to continue.</span></div>
       <div class="agree-row locked" id="agreeRow">
@@ -276,7 +298,7 @@
       <button type="button" class="btn btn-primary" id="btnSubmit" disabled>Agree &amp; Sign</button>
       <p class="req-note" id="reqNote">Complete all steps above to enable submission.</p>
     </div>
-    <footer>Almario Residence Visitor Management Form · Version 1.0 · Makati City, Philippines</footer>
+    <footer>Almario Residence Visitor Management Form · Version 2.0 · Makati City, Philippines</footer>
   </div>
 
   <!-- SUCCESS -->
@@ -307,11 +329,18 @@
 (function(){
   "use strict";
   var $ = function(id){ return document.getElementById(id); };
-  var state = { idPhoto:null, scrolledNda:false, sigPad:null, submitting:false, autoResetTimer:null };
+  var state = { idPhoto:null, scrolledNda:false, sigPad:null, submitting:false, autoResetTimer:null, eventConfig:null };
 
   /* ---------- live merge ---------- */
-  var mergeMap = { name:"fullName", address:"address", purpose:"purpose", mobile:"mobile", email:"email", idType:"idType" };
-  var placeholders = { name:"[Full Name]", address:"[Address]", purpose:"[Purpose of Visit]", mobile:"[Mobile Number]", email:"[Email Address]", idType:"[ID Type]" };
+  var mergeMap = { name:"fullName", address:"address", idType:"idType" };
+  var placeholders = { name:"[Full Name]", address:"[Address]", idType:"[ID Type]", eventName:"[Event Name]", eventDate:"[Event Date]" };
+  function currentEvent(){
+    if (state.eventConfig) return state.eventConfig;
+    return {
+      eventName: ($("evName").value || "").trim(),
+      eventDate: ($("evDate").value || "").trim()
+    };
+  }
   function updateMerges(){
     Object.keys(mergeMap).forEach(function(key){
       var v = ($(mergeMap[key]).value || "").trim();
@@ -320,9 +349,17 @@
         el.classList.toggle("filled", !!v);
       });
     });
+    var ev = currentEvent();
+    ["eventName","eventDate"].forEach(function(key){
+      var v = (ev[key] || "").trim();
+      document.querySelectorAll('[data-merge="'+key+'"]').forEach(function(el){
+        el.textContent = v || placeholders[key];
+        el.classList.toggle("filled", !!v);
+      });
+    });
     $("sigWho").textContent = "Signing as: " + (($("fullName").value||"").trim() || "—");
   }
-  ["fullName","address","mobile","email","purpose"].forEach(function(id){
+  ["fullName","address","mobile","email","purpose","evName","evDate"].forEach(function(id){
     $(id).addEventListener("input", function(){ updateMerges(); refreshSubmit(); });
   });
   $("idType").addEventListener("change", function(){ updateMerges(); refreshSubmit(); });
@@ -333,7 +370,28 @@
     var get = function(t){ var p=parts.find(function(x){return x.type===t;}); return p?p.value:""; };
     return ordinal(parseInt(get("day"),10)) + " day of " + get("month") + ", " + get("year");
   }
-  $("dateSigned").textContent = manilaDateSigned();
+  document.querySelectorAll(".nda-date-signed").forEach(function(el){ el.textContent = manilaDateSigned(); });
+
+  /* ---------- current event (admin-configured) ---------- */
+  function applyEventConfig(cfg){
+    if (cfg && cfg.eventName){
+      state.eventConfig = { eventName: cfg.eventName, eventDate: cfg.eventDate || "" };
+      $("manualEventFields").style.display = "none";
+      $("eventLine").style.display = "block";
+      $("eventLineTxt").textContent = cfg.eventName + (cfg.eventDate ? ", " + cfg.eventDate : "");
+    } else {
+      state.eventConfig = null;
+      $("manualEventFields").style.display = "block";
+      $("eventLine").style.display = "none";
+    }
+    updateMerges(); refreshSubmit();
+  }
+  function loadEventConfig(){
+    fetch("/api/event").then(function(r){ return r.json(); }).then(function(j){
+      applyEventConfig(j && j.ok ? j : null);
+    }).catch(function(){ applyEventConfig(null); });
+  }
+  loadEventConfig();
 
   /* ---------- chips (never destroy typed text) ---------- */
   var chipTexts = Array.prototype.map.call(document.querySelectorAll("#chips .chip"), function(c){ return c.textContent.trim(); });
@@ -443,7 +501,9 @@
       mobile: $("mobile").value.trim(),
       email: $("email").value.trim(),
       purpose: $("purpose").value.trim(),
-      idType: $("idType").value || ""
+      idType: $("idType").value || "",
+      eventName: currentEvent().eventName,
+      eventDate: currentEvent().eventDate
     };
   }
   function missing(){
@@ -454,6 +514,10 @@
     if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email)) out.push("a valid email address (or leave it blank)");
     if (v.purpose.length < 2) out.push("purpose of visit");
     if (!v.idType) out.push("ID type");
+    if (!state.eventConfig){
+      if (v.eventName.length < 2) out.push("event name");
+      if (v.eventDate.length < 2) out.push("event date");
+    }
     if (!state.idPhoto) out.push("a photo of your ID in Step 2");
     if (!$("agree").checked) out.push("tick the agreement box in Step 3");
     if (state.sigPad.isEmpty()) out.push("your signature in Step 4");
@@ -479,7 +543,9 @@
     var v = fieldValues();
     var payload = {
       fullName: v.fullName, address: v.address, mobile: v.mobile, email: v.email,
-      purpose: v.purpose, idType: v.idType, agreed: $("agree").checked,
+      purpose: v.purpose, idType: v.idType,
+      eventName: v.eventName, eventDate: v.eventDate,
+      agreed: $("agree").checked,
       signature: state.sigPad.toDataURL("image/png"),
       idPhoto: state.idPhoto
     };
@@ -532,7 +598,7 @@
   }
   function resetForm(){
     if (state.autoResetTimer){ clearInterval(state.autoResetTimer); state.autoResetTimer = null; }
-    ["fullName","address","mobile","email","purpose"].forEach(function(id){ $(id).value = ""; });
+    ["fullName","address","mobile","email","purpose","evName","evDate"].forEach(function(id){ $(id).value = ""; });
     $("idType").selectedIndex = 0;
     document.querySelectorAll("#chips .chip").forEach(function(c){ c.classList.remove("on"); });
     state.idPhoto = null;
@@ -550,6 +616,7 @@
     $("successView").style.display = "none";
     $("formView").style.display = "block";
     updateMerges(); refreshSubmit();
+    loadEventConfig(); // pick up any event-setting changes for the next visitor
     window.scrollTo(0,0);
     setTimeout(resizeCanvas, 50);
     setTimeout(checkScrolled, 100);
@@ -576,7 +643,7 @@
     if ($("successView").style.display === "block") return; // success screen has its own auto-reset
     if ($("idleOverlay").style.display === "flex") return;
     if (Date.now() - lastActivity < IDLE_MS) return;
-    var dirty = ["fullName","address","mobile","email","purpose"].some(function(id){ return $(id).value.trim() !== ""; })
+    var dirty = ["fullName","address","mobile","email","purpose","evName","evDate"].some(function(id){ return $(id).value.trim() !== ""; })
       || !!state.idPhoto || !state.sigPad.isEmpty() || $("agree").checked;
     if (!dirty){ lastActivity = Date.now(); return; }
     var secs = 30;

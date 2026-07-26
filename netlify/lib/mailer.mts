@@ -10,6 +10,7 @@ export interface EmailInputs {
   timestampManila: string;
   pdfBytes: Uint8Array;
   idPhoto: { bytes: Uint8Array; mime: string } | null;
+  receiptLink?: string | null;
 }
 
 // Returns an emailStatus string: "sent" | "pending: no credentials" | "failed: ..."
@@ -59,9 +60,10 @@ export async function sendSubmissionEmails(inp: EmailInputs): Promise<string> {
       text:
         `Dear ${inp.fullName},\n\n` +
         `Thank you for completing the Almario Residence Visitor Form.\n\n` +
-        `Attached is your signed copy of the Visitor, Contractor, and Service Provider ` +
-        `Confidentiality and Non-Disclosure Agreement, executed on ${inp.timestampManila}.\n\n` +
+        `Attached is your signed copy of the Confidentiality and Non-Disclosure Agreement, ` +
+        `executed on ${inp.timestampManila}.\n\n` +
         `Submission reference: ${inp.id}\n\n` +
+        (inp.receiptLink ? `You can also download your copy anytime: ${inp.receiptLink}\n\n` : ``) +
         `Please retain this copy for your records.\n\n` +
         `Almario Residence`,
       attachments: [pdfAttachment],

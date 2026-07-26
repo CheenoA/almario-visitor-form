@@ -60,6 +60,21 @@
   </div>
 
   <div id="adminView">
+    <div class="card" style="margin-bottom:18px;">
+      <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
+        <strong>Event settings</strong>
+        <span style="font-size:.82rem; color:var(--soft);">The kiosk merges this into the agreement. Clear both fields to let visitors type the event manually.</span>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <input type="text" id="evName" placeholder="Event name" autocomplete="off"
+          style="font-size:.95rem; padding:9px 12px; border:1px solid var(--line); border-radius:8px; min-width:220px;">
+        <input type="text" id="evDate" placeholder="Event date (e.g. July 30, 2026)" autocomplete="off"
+          style="font-size:.95rem; padding:9px 12px; border:1px solid var(--line); border-radius:8px; min-width:220px;">
+        <button class="btn btn-p btn-sm" id="btnEvSave">Save</button>
+        <button class="btn btn-d btn-sm" id="btnEvClear">Clear</button>
+        <span id="evMsg" style="font-size:.84rem; color:var(--soft);"></span>
+      </div>
+    </div>
     <div class="card">
       <div class="toolbar">
         <span id="msg">Loading…</span>
@@ -77,7 +92,7 @@
       <div style="overflow-x:auto;">
         <table id="tbl">
           <thead><tr>
-            <th>Visitor</th><th>Purpose</th><th class="hide-sm">Signed (Manila)</th><th>Email</th><th>Actions</th>
+            <th>Visitor</th><th>Purpose</th><th class="hide-sm">Signed (Manila)</th><th>Email</th><th>SMS</th><th>Actions</th>
           </tr></thead>
           <tbody id="rows"></tbody>
         </table>
@@ -117,6 +132,7 @@
           $("loginView").style.display = "none";
           $("adminView").style.display = "block";
           load();
+          loadEvent();
         } else if (r.status === 503){
           throw new Error("Server is missing the ADMIN_PASSCODE configuration.");
         } else {
@@ -132,6 +148,34 @@
   $("btnRefresh").addEventListener("click", load);
 
   function esc(s){ var d = document.createElement("div"); d.textContent = String(s == null ? "" : s); return d.innerHTML; }
+
+  /* ---------- event settings ---------- */
+  function loadEvent(){
+    api("event").then(function(r){ return r.json(); }).then(function(j){
+      if (!j.ok) throw new Error(j.error || "Could not load event settings.");
+      $("evName").value = j.eventName || "";
+      $("evDate").value = j.eventDate || "";
+      $("evMsg").textContent = j.eventName ? "Current event is set." : "No event set — kiosk asks visitors to type it.";
+    }).catch(function(e){ $("evMsg").textContent = e.message; });
+  }
+  function putEvent(name, date){
+    $("btnEvSave").disabled = true; $("btnEvClear").disabled = true;
+    api("event", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ eventName: name, eventDate: date })
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if (!j.ok) throw new Error(j.error || "Could not save event settings.");
+      $("evName").value = j.eventName || "";
+      $("evDate").value = j.eventDate || "";
+      $("evMsg").textContent = j.cleared ? "Event cleared — kiosk asks visitors to type it." : "Saved. Kiosk now shows: " + j.eventName + (j.eventDate ? ", " + j.eventDate : "");
+    }).catch(function(e){ $("evMsg").textContent = e.message; })
+      .finally(function(){ $("btnEvSave").disabled = false; $("btnEvClear").disabled = false; });
+  }
+  $("btnEvSave").addEventListener("click", function(){ putEvent($("evName").value.trim(), $("evDate").value.trim()); });
+  $("btnEvClear").addEventListener("click", function(){
+    if (confirm("Clear the current event? The kiosk will ask visitors to type the event name and date.")) putEvent("", "");
+  });
 
   function statusPill(st){
     st = String(st || "unknown");
@@ -178,9 +222,9 @@
   function csvCell(v){ v = String(v == null ? "" : v); return '"' + v.replace(/"/g, '""') + '"'; }
   $("btnExport").addEventListener("click", function(){
     var rows = filtered();
-    var lines = ["Name,Purpose,ID Type,Signed At (Manila),Email Status,Submission ID"];
+    var lines = ["Name,Purpose,ID Type,Signed At (Manila),Email Status,SMS Status,Submission ID"];
     rows.forEach(function(s){
-      lines.push([s.fullName, s.purpose, s.idType, s.submittedAtManila, s.emailStatus, s.id].map(csvCell).join(","));
+      lines.push([s.fullName, s.purpose, s.idType, s.submittedAtManila, s.emailStatus, s.smsStatus, s.id].map(csvCell).join(","));
     });
     var blob = new Blob([lines.join("\r\n")], { type: "text/csv" });
     var url = URL.createObjectURL(blob);
@@ -214,10 +258,11 @@
           "<td>" + esc(s.purpose) + "<br><span style='font-size:.8rem;color:var(--soft)'>" + esc(s.idType) + "</span></td>" +
           "<td class='hide-sm'>" + esc(s.submittedAtManila || "") + "</td>" +
           "<td>" + statusPill(s.emailStatus) + "</td>" +
+          "<td>" + statusPill(s.smsStatus) + "</td>" +
           "<td><div class='row-actions'>" +
             "<button class='btn btn-g btn-sm' data-act='pdf'>PDF</button>" +
             "<button class='btn btn-g btn-sm' data-act='id'>ID photo</button>" +
-            "<button class='btn btn-g btn-sm' data-act='resend'>Resend email</button>" +
+            "<button class='btn btn-g btn-sm' data-act='resend'>Resend</button>" +
             "<button class='btn btn-d btn-sm' data-act='del'>Delete</button>" +
           "</div></td>";
         tr.querySelectorAll("button[data-act]").forEach(function(b){
@@ -259,9 +304,9 @@
       btn.textContent = "Sending…";
       api("resend/" + s.id, { method:"POST" }).then(function(r){ return r.json(); }).then(function(j){
         if (!j.ok) throw new Error(j.error || "Resend failed.");
-        alert("Email status: " + j.emailStatus);
+        alert("Email status: " + j.emailStatus + "\nSMS status: " + j.smsStatus);
         load();
-      }).catch(alertErr).finally(function(){ btn.textContent = "Resend email"; done(); });
+      }).catch(alertErr).finally(function(){ btn.textContent = "Resend"; done(); });
     } else if (kind === "del"){
       if (!confirm("Delete submission " + s.id + " (" + s.fullName + ")? This removes the PDF, ID photo, and record permanently.")){ done(); return; }
       api("submission/" + s.id, { method:"DELETE" }).then(function(r){ return r.json(); }).then(function(j){

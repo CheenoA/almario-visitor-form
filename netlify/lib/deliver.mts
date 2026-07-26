@@ -1,9 +1,17 @@
-// Loads a stored submission from Blobs, sends the emails, and updates the
-// record's emailStatus. Shared by the background sender and the admin resend.
+// Loads a stored submission from Blobs, sends the emails + SMS, and updates
+// the record's emailStatus/smsStatus. Shared by the background sender and the
+// admin resend.
 import { getStore } from "@netlify/blobs";
 import { sendSubmissionEmails } from "./mailer.mts";
+import { sendSubmissionSms } from "./sms.mts";
+import { receiptLink } from "./receipt.mts";
 
-export async function deliverEmailsForSubmission(id: string): Promise<string> {
+export interface DeliveryResult {
+  emailStatus: string;
+  smsStatus: string;
+}
+
+export async function deliverEmailsForSubmission(id: string): Promise<DeliveryResult> {
   const store = getStore({ name: "submissions", consistency: "strong" });
   const rec = (await store.get(`records/${id}.json`, { type: "json" })) as any | null;
   if (!rec) throw new Error(`Record not found for ${id}`);
@@ -20,6 +28,11 @@ export async function deliverEmailsForSubmission(id: string): Promise<string> {
     // send without the photo rather than not at all
   }
 
+  const link = receiptLink(id); // null when LINK_SECRET is missing
+  rec.receiptLink = link;
+  if (!link) rec.receiptNote = "unavailable: LINK_SECRET not configured";
+  else delete rec.receiptNote;
+
   let emailStatus: string;
   try {
     emailStatus = await sendSubmissionEmails({
@@ -30,13 +43,27 @@ export async function deliverEmailsForSubmission(id: string): Promise<string> {
       timestampManila: rec.submittedAtManila,
       pdfBytes: new Uint8Array(pdf),
       idPhoto,
+      receiptLink: link,
     });
   } catch (e: any) {
     emailStatus = `failed: ${String(e?.message || e).slice(0, 200)}`;
   }
 
+  let smsStatus: string;
+  try {
+    smsStatus = await sendSubmissionSms({
+      id,
+      fullName: rec.fullName,
+      mobile: rec.mobile,
+      link,
+    });
+  } catch (e: any) {
+    smsStatus = `failed: ${String(e?.message || e).slice(0, 160)}`;
+  }
+
   rec.emailStatus = emailStatus;
+  rec.smsStatus = smsStatus;
   rec.emailLastAttemptAtISO = new Date().toISOString();
   await store.setJSON(`records/${id}.json`, rec);
-  return emailStatus;
+  return { emailStatus, smsStatus };
 }

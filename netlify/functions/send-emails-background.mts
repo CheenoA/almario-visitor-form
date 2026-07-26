@@ -28,8 +28,8 @@ export default async (req: Request, _context: Context) => {
   }
 
   try {
-    const status = await deliverEmailsForSubmission(id);
-    console.log(`send-emails-background: ${id} -> ${status}`);
+    const { emailStatus, smsStatus } = await deliverEmailsForSubmission(id);
+    console.log(`send-emails-background: ${id} -> email=${emailStatus} sms=${smsStatus}`);
   } catch (e: any) {
     console.error(`send-emails-background: ${id} delivery error`, e?.message || e);
   }
