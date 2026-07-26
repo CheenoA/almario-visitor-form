@@ -52,7 +52,9 @@ async function sendViaSemaphore(apiKey: string, inp: SmsInputs): Promise<string>
         apikey: apiKey,
         number,
         message: smsBody(inp),
-        sendername: Netlify.env.get("SEMAPHORE_SENDER") || "SEMAPHORE",
+        // Only pass sendername when explicitly configured; otherwise let the
+        // Semaphore account default apply (custom names require approval).
+        ...(Netlify.env.get("SEMAPHORE_SENDER") ? { sendername: Netlify.env.get("SEMAPHORE_SENDER")! } : {}),
       }).toString(),
     });
     let data: any = null;
