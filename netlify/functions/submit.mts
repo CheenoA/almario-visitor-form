@@ -1,6 +1,6 @@
 import type { Context, Config } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
-import { buildNdaPdf, manilaDateSigned, manilaTimestamp, NDA_VERSION, type NdaFields } from "../lib/nda.mts";
+import { buildNdaPdf, manilaTimestamp, NDA_VERSION, type NdaFields } from "../lib/nda.mts";
 
 const MAX_BODY = 5_800_000; // stay under Netlify's ~6MB function payload limit
 
@@ -66,30 +66,7 @@ export default async (req: Request, context: Context) => {
   const purpose = clean(body.purpose, 300);
   const idType = clean(body.idType, 60);
 
-  // Event: the admin-configured "current event" wins; otherwise the kiosk's
-  // manually entered values are used.
-  let eventName = "";
-  let eventDate = "";
-  let eventSource = "manual";
-  try {
-    const cfgStore = getStore({ name: "config", consistency: "strong" });
-    const cfg = (await cfgStore.get("current-event", { type: "json" })) as any | null;
-    if (cfg && typeof cfg.eventName === "string" && cfg.eventName.trim()) {
-      eventName = clean(cfg.eventName, 120);
-      eventDate = clean(cfg.eventDate, 80);
-      eventSource = "config";
-    }
-  } catch {
-    // fall through to manual values
-  }
-  if (eventSource === "manual") {
-    eventName = clean(body.eventName, 120);
-    eventDate = clean(body.eventDate, 80);
-  }
-
   const errors: string[] = [];
-  if (eventName.length < 2) errors.push("Event name is required.");
-  if (eventDate.length < 2) errors.push("Event date is required.");
   if (fullName.length < 2) errors.push("Full name is required.");
   if (address.length < 5) errors.push("Address is required.");
   if (!/^[+\d][\d\s()-]{6,}$/.test(mobile)) errors.push("A valid mobile number is required.");
@@ -133,15 +110,14 @@ export default async (req: Request, context: Context) => {
   const timestampManila = manilaTimestamp(now);
 
   const fields: NdaFields = {
-    fullName, address, mobile, email, purpose, idType, eventName, eventDate,
-    dateSigned: manilaDateSigned(now),
+    fullName, address, mobile, email, purpose, idType,
   };
 
   // Audit hash: SHA-256 over canonical JSON of the signed content.
   const signatureB64 = String(body.signature).replace(/^data:[^,]+,/, "");
   const canonical = JSON.stringify({
     id,
-    fields: { fullName, address, mobile, email, purpose, idType, eventName, eventDate },
+    fields: { fullName, address, mobile, email, purpose, idType },
     timestampISO: now.toISOString(),
     signature: signatureB64,
   });
@@ -166,7 +142,6 @@ export default async (req: Request, context: Context) => {
   const record: Record<string, unknown> = {
     id,
     fullName, address, mobile, email, purpose, idType,
-    eventName, eventDate, eventSource,
     ndaVersion: NDA_VERSION,
     submittedAtISO: now.toISOString(),
     submittedAtManila: timestampManila,

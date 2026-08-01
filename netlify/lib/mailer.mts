@@ -59,7 +59,7 @@ export async function sendSubmissionEmails(inp: EmailInputs): Promise<string> {
       subject: `Almario Residence – Your signed Visitor Confidentiality Agreement (${inp.id})`,
       text:
         `Dear ${inp.fullName},\n\n` +
-        `Thank you for completing the Almario Residence Visitor Form.\n\n` +
+        `Thank you for completing the Almario Residence electronic Visitor Registration Form (e-ARVRF).\n\n` +
         `Attached is your signed copy of the Confidentiality and Non-Disclosure Agreement, ` +
         `executed on ${inp.timestampManila}.\n\n` +
         `Submission reference: ${inp.id}\n\n` +
@@ -85,7 +85,7 @@ export async function sendSubmissionEmails(inp: EmailInputs): Promise<string> {
       });
     }
     await transporter.sendMail({
-      from: `"Almario Residence Visitor Form" <${user}>`,
+      from: `"Almario Residence e-ARVRF" <${user}>`,
       to: household,
       subject: `Visitor signed: ${inp.fullName} – ${inp.purpose}`,
       text:

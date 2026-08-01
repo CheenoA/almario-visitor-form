@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Almario Residence Visitor Form — Admin</title>
+<title>e-ARVRF Admin — Almario Residence</title>
 <meta name="robots" content="noindex">
 <style>
   :root{ --paper:#faf7f2; --card:#fff; --ink:#211d18; --soft:#5c554b; --line:#e4ddd2;
@@ -49,8 +49,8 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Almario Residence Visitor Form</h1>
-  <div class="sub">Administration — signed visitor agreements</div>
+  <h1>Almario Residence Visitor Registration Form</h1>
+  <div class="sub">e-ARVRF Admin — signed visitor agreements</div>
 
   <div class="card" id="loginView" style="max-width:420px; text-align:center; padding:34px;">
     <p style="margin-bottom:16px;">Enter the admin passcode to continue.</p>
@@ -60,21 +60,6 @@
   </div>
 
   <div id="adminView">
-    <div class="card" style="margin-bottom:18px;">
-      <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
-        <strong>Event settings</strong>
-        <span style="font-size:.82rem; color:var(--soft);">The kiosk merges this into the agreement. Clear both fields to let visitors type the event manually.</span>
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-        <input type="text" id="evName" placeholder="Event name" autocomplete="off"
-          style="font-size:.95rem; padding:9px 12px; border:1px solid var(--line); border-radius:8px; min-width:220px;">
-        <input type="text" id="evDate" placeholder="Event date (e.g. July 30, 2026)" autocomplete="off"
-          style="font-size:.95rem; padding:9px 12px; border:1px solid var(--line); border-radius:8px; min-width:220px;">
-        <button class="btn btn-p btn-sm" id="btnEvSave">Save</button>
-        <button class="btn btn-d btn-sm" id="btnEvClear">Clear</button>
-        <span id="evMsg" style="font-size:.84rem; color:var(--soft);"></span>
-      </div>
-    </div>
     <div class="card">
       <div class="toolbar">
         <span id="msg">Loading…</span>
@@ -132,7 +117,6 @@
           $("loginView").style.display = "none";
           $("adminView").style.display = "block";
           load();
-          loadEvent();
         } else if (r.status === 503){
           throw new Error("Server is missing the ADMIN_PASSCODE configuration.");
         } else {
@@ -148,34 +132,6 @@
   $("btnRefresh").addEventListener("click", load);
 
   function esc(s){ var d = document.createElement("div"); d.textContent = String(s == null ? "" : s); return d.innerHTML; }
-
-  /* ---------- event settings ---------- */
-  function loadEvent(){
-    api("event").then(function(r){ return r.json(); }).then(function(j){
-      if (!j.ok) throw new Error(j.error || "Could not load event settings.");
-      $("evName").value = j.eventName || "";
-      $("evDate").value = j.eventDate || "";
-      $("evMsg").textContent = j.eventName ? "Current event is set." : "No event set — kiosk asks visitors to type it.";
-    }).catch(function(e){ $("evMsg").textContent = e.message; });
-  }
-  function putEvent(name, date){
-    $("btnEvSave").disabled = true; $("btnEvClear").disabled = true;
-    api("event", {
-      method: "PUT",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ eventName: name, eventDate: date })
-    }).then(function(r){ return r.json(); }).then(function(j){
-      if (!j.ok) throw new Error(j.error || "Could not save event settings.");
-      $("evName").value = j.eventName || "";
-      $("evDate").value = j.eventDate || "";
-      $("evMsg").textContent = j.cleared ? "Event cleared — kiosk asks visitors to type it." : "Saved. Kiosk now shows: " + j.eventName + (j.eventDate ? ", " + j.eventDate : "");
-    }).catch(function(e){ $("evMsg").textContent = e.message; })
-      .finally(function(){ $("btnEvSave").disabled = false; $("btnEvClear").disabled = false; });
-  }
-  $("btnEvSave").addEventListener("click", function(){ putEvent($("evName").value.trim(), $("evDate").value.trim()); });
-  $("btnEvClear").addEventListener("click", function(){
-    if (confirm("Clear the current event? The kiosk will ask visitors to type the event name and date.")) putEvent("", "");
-  });
 
   function statusPill(st){
     st = String(st || "unknown");

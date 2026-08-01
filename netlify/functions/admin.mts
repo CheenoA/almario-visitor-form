@@ -61,39 +61,6 @@ export default async (req: Request, context: Context) => {
     return json(200, { ok: true });
   }
 
-  // GET/PUT /api/admin/event — current-event settings for the kiosk
-  if (action === "event") {
-    const cfgStore = getStore({ name: "config", consistency: "strong" });
-    if (req.method === "GET") {
-      const cfg = ((await cfgStore.get("current-event", { type: "json" })) as any) || null;
-      return json(200, {
-        ok: true,
-        eventName: cfg?.eventName || null,
-        eventDate: cfg?.eventDate || null,
-      });
-    }
-    if (req.method === "PUT") {
-      let body: any;
-      try {
-        body = await req.json();
-      } catch {
-        return json(400, { ok: false, error: "Invalid JSON body" });
-      }
-      const eventName = String(body?.eventName ?? "").replace(/\s+/g, " ").trim().slice(0, 120);
-      const eventDate = String(body?.eventDate ?? "").replace(/\s+/g, " ").trim().slice(0, 80);
-      if (!eventName && !eventDate) {
-        // Clearing the event settings
-        await cfgStore.delete("current-event");
-        return json(200, { ok: true, cleared: true, eventName: null, eventDate: null });
-      }
-      if (!eventName || !eventDate) {
-        return json(422, { ok: false, error: "Both event name and event date are required (or leave both blank to clear)." });
-      }
-      await cfgStore.setJSON("current-event", { eventName, eventDate, updatedAtISO: new Date().toISOString() });
-      return json(200, { ok: true, eventName, eventDate });
-    }
-    return json(405, { ok: false, error: "Method not allowed" });
-  }
 
   // GET /api/admin/submissions
   if (action === "submissions" && req.method === "GET") {
